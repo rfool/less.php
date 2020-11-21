@@ -8,7 +8,6 @@ This is the Wikimedia fork of a PHP port of the official LESS processor <http://
 * [About](#about)
 * [Installation](#installation)
 * [Basic Use](#basic-use)
-* [Caching](#caching)
 * [Source Maps](#source-maps)
 * [Command Line](#command-line)
 * [Integration with other projects](#integration-with-other-projects)
@@ -156,11 +155,9 @@ $css = $parser->getCss();
 ```
 
 
-Caching
+Source Maps
 ---
-Compiling LESS code into CSS is a time consuming process, caching your results is highly recommended.
-
-
+Less.php supports v3 sourcemaps
 
 #### Inline
 The sourcemap will be appended to the generated CSS file.

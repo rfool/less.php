@@ -1,10 +1,10 @@
 <?php
 
-if (!class_exists(PHPUnit_Framework_TestCase::class)) {
+if( !class_exists(PHPUnit_Framework_TestCase::class) ) {
 	class_alias(\PHPUnit\Framework\TestCase::class, PHPUnit_Framework_TestCase::class);
 }
 
-class phpunit_bootstrap extends PHPUnit_Framework_TestCase{
+class phpunit_bootstrap extends PHPUnit_Framework_TestCase {
 
 	public $fixtures_dir;
 	public $cache_dir;
@@ -23,7 +23,6 @@ class phpunit_bootstrap extends PHPUnit_Framework_TestCase{
 		$this->cache_dir = $root_directory.'/test/phpunit/_cache/';
 		$this->CheckCacheDirectory();
 
-
 		echo "\n\n";
 	}
 
@@ -32,17 +31,14 @@ class phpunit_bootstrap extends PHPUnit_Framework_TestCase{
 	 *
 	 */
 	function CheckCacheDirectory(){
-
 		if( !file_exists($this->cache_dir) && !mkdir($this->cache_dir) ){
 			echo "\n  cache_dir could not be created:    ".$this->cache_dir;
 			return false;
 		}
-
 		if( !is_writable($this->cache_dir) ){
 			echo "\n  cache_dir not writable:    ".$this->cache_dir;
 			return false;
 		}
-
 		echo "\n  cache_dir:    ".$this->cache_dir;
 	}
 
