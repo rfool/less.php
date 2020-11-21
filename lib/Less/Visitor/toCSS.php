@@ -6,7 +6,7 @@
  * @package Less
  * @subpackage visitor
  */
-class Less_Visitor_toCSS extends Less_VisitorReplacing{
+class Less_Visitor_toCSS extends Less_VisitorReplacing {
 
 	private $charset;
 
