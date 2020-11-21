@@ -22,7 +22,7 @@ class Less_Visitor {
 			$visitDeeper = true;
 			$this->$funcName($node,$visitDeeper);
 			if( $visitDeeper ) $node->accept($this);
-			$funcName = $funcName . "Out";
+			$funcName = $funcName . 'Out';
 			if( isset($this->_visitFnCache[$funcName]) ) $this->$funcName($node);
 		} else {
 			$node->accept($this);

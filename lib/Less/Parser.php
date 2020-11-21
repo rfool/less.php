@@ -306,7 +306,7 @@ class Less_Parser{
 	 * Run pre-compile visitors
 	 *
 	 */
-	private function PreVisitors($root) {
+	private function PreVisitors( Less_Tree_Ruleset $root ) {
 		if( Less_Parser::$options['plugins'] ) {
 			foreach( Less_Parser::$options['plugins'] as $plugin ) {
 				if( !empty($plugin->isPreEvalVisitor) ) $plugin->run($root);
@@ -319,7 +319,7 @@ class Less_Parser{
 	 * Run post-compile visitors
 	 *
 	 */
-	private function PostVisitors( $evaldRoot ) {
+	private function PostVisitors( Less_Tree_Ruleset $evaldRoot ) {
 		$visitors = [];
 		$visitors[] = new Less_Visitor_joinSelector();
 		if( self::$has_extends ) $visitors[] = new Less_Visitor_processExtends();
@@ -351,16 +351,12 @@ class Less_Parser{
 			$filename = $file_uri;
 			$uri_root = dirname($file_uri);
 		}
-
 		$previousFileInfo = $this->env->currentFileInfo;
 		$uri_root = self::WinPath($uri_root);
 		$this->SetFileInfo($filename,$uri_root);
-
 		$this->input = $str;
 		$this->_parse();
-
 		if( $previousFileInfo ) $this->env->currentFileInfo = $previousFileInfo;
-
 		return $this;
 	}
 
@@ -376,8 +372,6 @@ class Less_Parser{
 	 */
 	public function parseFile( string $filename, string $uri_root='', bool $returnRoot=false ) {
 		if( !file_exists($filename) ) $this->Error(sprintf('File `%s` not found.', $filename));
-		// fix uri_root?
-		// Instead of The mixture of file path for the first argument and directory path for the second argument has bee
 		if( !$returnRoot && !empty($uri_root) && basename($uri_root)==basename($filename) ) $uri_root = dirname($uri_root);
 		$previousFileInfo = $this->env->currentFileInfo;
 		if( $filename ) $filename = self::AbsPath($filename,true);
@@ -385,8 +379,7 @@ class Less_Parser{
 		$this->SetFileInfo($filename,$uri_root);
 		self::AddParsedFile($filename);
 		if( $returnRoot ) {
-			$rules = $this->GetRules($filename);
-			$return = new Less_Tree_Ruleset([], $rules );
+			$return = new Less_Tree_Ruleset([],$this->GetRules($filename));
 		} else {
 			$this->_parse($filename);
 			$return = $this;
@@ -401,11 +394,13 @@ class Less_Parser{
 	public function SetFileInfo( string $filename, string $uri_root='' ) {
 		$filename = Less_Environment::normalizePath($filename);
 		$dirname = preg_replace('/[^\/\\\\]*$/','',$filename);
-
 		if( !empty($uri_root) ) $uri_root = rtrim($uri_root,'/').'/';
-
-		$currentFileInfo = [];
-
+		$currentFileInfo = [
+			'currentDirectory' => $dirname,
+			'currentUri' => $uri_root.basename($filename),
+			'filename' => $filename,
+			'uri_root' => $uri_root,
+		];
 		//entry info
 		if( isset($this->env->currentFileInfo) ) {
 			$currentFileInfo['entryPath'] = $this->env->currentFileInfo['entryPath'];
@@ -416,15 +411,8 @@ class Less_Parser{
 			$currentFileInfo['entryUri'] = $uri_root;
 			$currentFileInfo['rootpath'] = $dirname;
 		}
-
-		$currentFileInfo['currentDirectory'] = $dirname;
-		$currentFileInfo['currentUri'] = $uri_root.basename($filename);
-		$currentFileInfo['filename'] = $filename;
-		$currentFileInfo['uri_root'] = $uri_root;
-
 		//inherit reference
 		if( isset($this->env->currentFileInfo['reference']) && $this->env->currentFileInfo['reference'] ) $currentFileInfo['reference'] = true;
-
 		$this->env->currentFileInfo = $currentFileInfo;
 	}
 
@@ -475,7 +463,7 @@ class Less_Parser{
 	 * Set up the input buffer
 	 *
 	 */
-	public function SetInput( string $file_path ) {
+	public function SetInput( ?string $file_path ) {
 		if( $file_path ) $this->input = file_get_contents($file_path);
 		$this->pos = $this->furthest = 0;
 		// Remove potential UTF Byte Order Mark
