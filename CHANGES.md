@@ -1,5 +1,5 @@
 # 3.1.0
-- [All Changes](https://github.com/rfool/less.php/compare/3.0.0...3.1.0)
+- [All Changes](https://github.com/rfool/less.php/compare/v3.0.0...v3.1.0)
 - Remove caching code (Robert Frunzke)
 - Parser optimizations (Robert Frunzke)
 
