@@ -1,3 +1,8 @@
+# 3.1.0
+- [All Changes](https://github.com/rfool/less.php/compare/3.0.0...3.1.0)
+- Remove caching code (Robert Frunzke)
+- Parser optimizations (Robert Frunzke)
+
 # 3.0.0
 - [All Changes](https://github.com/wikimedia/less.php/compare/2.0.0...3.0.0)
 - Raise PHP requirement from 7.1 to 7.2.9 (James Forrester)

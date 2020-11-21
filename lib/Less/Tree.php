@@ -6,9 +6,7 @@
  * @package Less
  * @subpackage tree
  */
-class Less_Tree{
-
-	public $cache_string;
+class Less_Tree {
 
 	public function toCSS(){
 		$output = new Less_Output();
