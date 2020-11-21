@@ -25,10 +25,6 @@ class Less_Parser{
 
 		'import_dirs'			=> [],
 		'import_callback'		=> null,
-		'cache_dir'				=> null,
-		'cache_method'			=> 'php', 			// false, 'serialize', 'php', 'var_export', 'callback';
-		'cache_callback_get'	=> null,
-		'cache_callback_set'	=> null,
 
 		'sourceMap'				=> false,			// whether to output a source map
 		'sourceMapBasepath'		=> null,
@@ -38,7 +34,6 @@ class Less_Parser{
 		'indentation' 			=> '  ',
 
 		'plugins'				=> [],
-
 	);
 
 	public static $options = [];
@@ -118,7 +113,7 @@ class Less_Parser{
 
 	/**
 	 * Set one or more compiler options
-	 *  options: import_dirs, cache_dir, cache_method
+	 *  options: import_dirs
 	 *
 	 */
 	public function SetOptions( array $options ) {
@@ -133,12 +128,6 @@ class Less_Parser{
 		switch( $option ) {
 		case 'import_dirs':
 			$this->SetImportDirs($value);
-			return;
-		case 'cache_dir':
-			if( is_string($value) ) {
-				Less_Cache::SetCacheDir($value);
-				Less_Cache::CheckCacheDir();
-			}
 			return;
 		}
 		Less_Parser::$options[$option] = $value;
@@ -474,22 +463,6 @@ class Less_Parser{
 	}
 
 
-	/**
-	 * @deprecated 1.5.1.2
-	 *
-	 */
-	public function SetCacheDir( string $dir ) : bool {
-		if( !file_exists($dir) ) {
-			if( mkdir($dir) ) return true;
-			throw new Less_Exception_Parser('Less.php cache directory couldn\'t be created: '.$dir);
-		}
-		if( !is_dir($dir) ) throw new Less_Exception_Parser('Less.php cache directory doesn\'t exist: '.$dir);
-		if( !is_writable($dir) ) throw new Less_Exception_Parser('Less.php cache directory isn\'t writable: '.$dir);
-		$dir = self::WinPath($dir);
-		Less_Cache::$cache_dir = rtrim($dir,'/').'/';
-		return true;
-	}
-
 
 	/**
 	 * Set a list of directories or callbacks the parser should use for determining import paths
@@ -525,68 +498,9 @@ class Less_Parser{
 	 */
 	private function GetRules( ?string $file_path ) {
 		$this->SetInput($file_path);
-		$cache_file = $this->CacheFile($file_path);
-		if( $cache_file ) {
-			if( Less_Parser::$options['cache_method']=='callback' ) {
-				if( is_callable(Less_Parser::$options['cache_callback_get']) ) {
-					$cache = call_user_func_array(
-						Less_Parser::$options['cache_callback_get'],
-						array($this, $file_path, $cache_file)
-					);
-					if( $cache ) {
-						$this->UnsetInput();
-						return $cache;
-					}
-				}
-			} else if( file_exists($cache_file) ) {
-				switch( Less_Parser::$options['cache_method'] ) {
-				// Using serialize
-				// Faster but uses more memory
-				case 'serialize':
-					$cache = unserialize(file_get_contents($cache_file));
-					if( $cache ) {
-						touch($cache_file);
-						$this->UnsetInput();
-						return $cache;
-					}
-					break;
-				// Using generated php code
-				case 'var_export':
-				case 'php':
-					$this->UnsetInput();
-					return include($cache_file);
-				}
-			}
-		}
 		$rules = $this->parsePrimary();
 		if( $this->pos<$this->input_len ) throw new Less_Exception_Chunk($this->input, null, $this->furthest, $this->env->currentFileInfo);
 		$this->UnsetInput();
-		//save the cache
-		if( $cache_file ) {
-			if( Less_Parser::$options['cache_method'] == 'callback' ) {
-				if( is_callable(Less_Parser::$options['cache_callback_set']) ) {
-					call_user_func_array(
-						Less_Parser::$options['cache_callback_set'],
-						array($this, $file_path, $cache_file, $rules)
-					);
-				}
-			} else {
-				//msg('write cache file');
-				switch( Less_Parser::$options['cache_method'] ) {
-				case 'serialize':
-					file_put_contents( $cache_file, serialize($rules) );
-					break;
-				case 'php':
-					file_put_contents( $cache_file, '<?php return '.self::ArgString($rules).'; ?>' );
-					break;
-				case 'var_export':
-					//Requires __set_state()
-					file_put_contents( $cache_file, '<?php return '.var_export($rules,true).'; ?>' );
-					break;
-				}
-				Less_Cache::CleanCache();
-			}
-		}
 		return $rules;
 	}
 
@@ -615,22 +529,6 @@ class Less_Parser{
 	public function UnsetInput() {
 		unset($this->input,$this->pos,$this->input_len,$this->furthest);
 		$this->saveStack = [];
-	}
-
-
-	public function CacheFile( string $file_path ) {
-		if( $file_path && $this->CacheEnabled() ) {
-			$env = get_object_vars($this->env);
-			unset($env['frames']);
-			$parts = [];
-			$parts[] = $file_path;
-			$parts[] = filesize( $file_path );
-			$parts[] = filemtime( $file_path );
-			$parts[] = $env;
-			$parts[] = Less_Version::cache_version;
-			$parts[] = Less_Parser::$options['cache_method'];
-			return Less_Cache::$cache_dir . Less_Cache::$prefix . base_convert( sha1(json_encode($parts) ), 16, 36) . '.lesscache';
-		}
 	}
 
 
@@ -2133,81 +2031,36 @@ class Less_Parser{
 	 *
 	 * @return mixed
 	 */
-	public function NewObj0( string $class ) {
-		$obj = new $class();
-		if( $this->CacheEnabled() ) $obj->cache_string = ' new '.$class.'()';
-		return $obj;
+	private function NewObj0( string $class ) : Less_Tree {
+		return new $class();
 	}
 
-	public function NewObj1( string $class, $arg ) {
-		$obj = new $class( $arg );
-		if( $this->CacheEnabled() ) $obj->cache_string = ' new '.$class.'('.Less_Parser::ArgString($arg).')';
-		return $obj;
+	private function NewObj1( string $class, $arg ) : Less_Tree {
+		return new $class( $arg );
 	}
 
-	public function NewObj2( string $class, $args ) {
-		$obj = new $class( $args[0], $args[1] );
-		if( $this->CacheEnabled() ) $this->ObjCache( $obj, $class, $args);
-		return $obj;
+	private function NewObj2( string $class, array $args ) : Less_Tree {
+		return new $class( $args[0], $args[1] );
 	}
 
-	public function NewObj3( string $class, $args ) {
-		$obj = new $class( $args[0], $args[1], $args[2] );
-		if( $this->CacheEnabled() ) $this->ObjCache( $obj, $class, $args);
-		return $obj;
+	private function NewObj3( string $class, array $args ) : Less_Tree {
+		return new $class( $args[0], $args[1], $args[2] );
 	}
 
-	public function NewObj4( string $class, $args ) {
-		$obj = new $class( $args[0], $args[1], $args[2], $args[3] );
-		if( $this->CacheEnabled() ) $this->ObjCache( $obj, $class, $args);
-		return $obj;
+	private function NewObj4( string $class, array $args ) : Less_Tree {
+		return new $class( $args[0], $args[1], $args[2], $args[3] );
 	}
 
-	public function NewObj5( string $class, $args ) {
-		$obj = new $class( $args[0], $args[1], $args[2], $args[3], $args[4] );
-		if( $this->CacheEnabled() ) $this->ObjCache( $obj, $class, $args);
-		return $obj;
+	private function NewObj5( string $class, array $args ) : Less_Tree {
+		return new $class( $args[0], $args[1], $args[2], $args[3], $args[4] );
 	}
 
-	public function NewObj6( string $class, $args ) {
-		$obj = new $class( $args[0], $args[1], $args[2], $args[3], $args[4], $args[5] );
-		if( $this->CacheEnabled() ) $this->ObjCache( $obj, $class, $args);
-		return $obj;
+	private function NewObj6( string $class, array $args ) : Less_Tree {
+		return new $class( $args[0], $args[1], $args[2], $args[3], $args[4], $args[5] );
 	}
 
-	public function NewObj7( string $class, $args ) {
-		$obj = new $class( $args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6] );
-		if( $this->CacheEnabled() ) $this->ObjCache( $obj, $class, $args);
-		return $obj;
-	}
-
-	//caching
-	public function ObjCache( $obj, string $class, $args=[] ) {
-		$obj->cache_string = ' new '.$class.'('. self::ArgCache($args).')';
-	}
-
-	public function ArgCache( array $args ) : string {
-		return implode(',',array_map(array('Less_Parser','ArgString'),$args));
-	}
-
-
-	/**
-	 * Convert an argument to a string for use in the parser cache
-	 *
-	 * @return string
-	 */
-	public static function ArgString( $arg ) : string {
-		$type = gettype($arg);
-		if( $type==='object' ) {
-			$string = $arg->cache_string;
-			unset($arg->cache_string);
-			return $string;
-		} else if( $type==='array' ) {
-			$string = ' Array(';
-			foreach( $arg as $k=>$a ) $string .= var_export($k,true).'=>'.self::ArgString($a).',';
-			return $string . ')';
-		}
-		return var_export($arg,true);
+	private function NewObj7( string $class, array $args ) : Less_Tree {
+		return new $class( $args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6] );
 	}
 
 	public function Error( string $msg ) {
@@ -2223,14 +2076,6 @@ class Less_Parser{
 		$path = realpath($path);
 		if( $winPath ) $path = self::WinPath($path);
 		return $path;
-	}
-
-	private $_cache_enabled = null;
-
-	public function CacheEnabled() : bool {
-		if( $this->_cache_enabled===null ) $this->_cache_enabled = Less_Parser::$options['cache_method'] && ( Less_Cache::$cache_dir || Less_Parser::$options['cache_method']==='callback' );
-		return $this->_cache_enabled;
-		// return Less_Parser::$options['cache_method'] && ( Less_Cache::$cache_dir || Less_Parser::$options['cache_method']==='callback' );
 	}
 
 }
