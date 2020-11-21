@@ -851,22 +851,18 @@ class Less_Parser{
 	 *
 	 * @return string
 	 */
-	private function MatchFuncs($toks){
-
-		if( $this->pos < $this->input_len ){
-			foreach($toks as $tok){
+	private function MatchFuncs( array $toks ) {
+		if( $this->pos < $this->input_len ) {
+			foreach( $toks as $tok ){
 				$match = $this->$tok();
-				if( $match ){
-					return $match;
-				}
+				if( $match ) return $match;
 			}
 		}
-
 	}
 
 	// Match a single character in the input,
-	private function MatchChar($tok){
-		if( ($this->pos < $this->input_len) && ($this->input[$this->pos] === $tok) ){
+	private function MatchChar( string $tok ) {
+		if( $this->pos < $this->input_len && $this->input[$this->pos]===$tok ) {
 			$this->skipWhitespace(1);
 			return $tok;
 		}
@@ -905,16 +901,11 @@ class Less_Parser{
 	/**
 	 * @param integer $length
 	 */
-	public function skipWhitespace($length){
-
+	public function skipWhitespace( int $length ) {
 		$this->pos += $length;
-
-		for(; $this->pos < $this->input_len; $this->pos++ ){
+		for(; $this->pos < $this->input_len; $this->pos++ ) {
 			$c = $this->input[$this->pos];
-
-			if( ($c !== "\n") && ($c !== "\r") && ($c !== "\t") && ($c !== ' ') ){
-				break;
-			}
+			if( $c!=="\n" && $c!=="\r" && $c!=="\t" && $c!==' ' ) return;
 		}
 	}
 
@@ -995,9 +986,7 @@ class Less_Parser{
 
 		while( true ){
 
-			if( $this->pos >= $this->input_len ){
-				break;
-			}
+			if( $this->pos >= $this->input_len ) return $root;
 
 			$node = $this->parseExtend(true);
 			if( $node ){
@@ -1008,15 +997,10 @@ class Less_Parser{
 			//$node = $this->MatchFuncs( array( 'parseMixinDefinition', 'parseRule', 'parseRuleset', 'parseMixinCall', 'parseComment', 'parseDirective'));
 			$node = $this->MatchFuncs( array( 'parseMixinDefinition', 'parseNameValue', 'parseRule', 'parseRuleset', 'parseMixinCall', 'parseComment', 'parseRulesetCall', 'parseDirective'));
 
-			if( $node ){
-				$root[] = $node;
-			}elseif( !$this->MatchReg('/\\G[\s\n;]+/') ){
-				break;
-			}
+			if( $node ) $root[] = $node;
+			elseif( !$this->MatchReg('/\\G[\s\n;]+/') )  return $root;
 
-			if( $this->PeekChar('}') ){
-				break;
-			}
+			if( $this->PeekChar('}') ) return $root;
 		}
 
 		return $root;
@@ -1427,7 +1411,7 @@ class Less_Parser{
 		$extendList = array();
 
 
-		if( !$this->MatchReg( $isRule ? '/\\G&:extend\(/' : '/\\G:extend\(/' ) ){ return; }
+		if( !$this->MatchReg( $isRule ? '/\\G&:extend\(/' : '/\\G:extend\(/' ) ) return;
 
 		do{
 			$option = null;
@@ -1446,7 +1430,7 @@ class Less_Parser{
 
 			$extendList[] = $this->NewObj3('Less_Tree_Extend', array( $this->NewObj1('Less_Tree_Selector',$elements), $option, $index ));
 
-		}while( $this->MatchChar(",") );
+		} while( $this->MatchChar(",") );
 
 		$this->expect('/\\G\)/');
 
@@ -1934,9 +1918,7 @@ class Less_Parser{
 	private function parseBlock(){
 		if( $this->MatchChar('{') ){
 			$content = $this->parsePrimary();
-			if( $this->MatchChar('}') ){
-				return $content;
-			}
+			if( $this->MatchChar('}') ) return $content;
 		}
 	}
 
