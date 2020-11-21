@@ -6,7 +6,7 @@
  * @package Less
  * @subpackage visitor
  */
-class Less_Visitor_extendFinder extends Less_Visitor{
+class Less_Visitor_extendFinder extends Less_Visitor {
 
 	public $contexts = array();
 	public $allExtendsStack;
@@ -21,7 +21,7 @@ class Less_Visitor_extendFinder extends Less_Visitor{
 	/**
 	 * @param Less_Tree_Ruleset $root
 	 */
-    public function run($root){
+    public function run( Less_Tree_Ruleset $root ) : Less_Tree_Ruleset {
 		$root = $this->visitObj($root);
 		$root->allExtends =& $this->allExtendsStack[0];
 		return $root;

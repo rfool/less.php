@@ -6,14 +6,14 @@
  * @package Less
  * @subpackage visitor
  */
-class Less_Visitor_joinSelector extends Less_Visitor{
+class Less_Visitor_joinSelector extends Less_Visitor {
 
 	public $contexts = array( array() );
 
 	/**
 	 * @param Less_Tree_Ruleset $root
 	 */
-	public function run( $root ){
+	public function run( Less_Tree_Ruleset $root ) : Less_Tree_Ruleset {
 		return $this->visitObj($root);
 	}
 

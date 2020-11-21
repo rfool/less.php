@@ -6,9 +6,9 @@
  * @package Less
  * @subpackage visitor
  */
-class Less_VisitorReplacing extends Less_Visitor{
+class Less_VisitorReplacing extends Less_Visitor {
 
-	public function visitObj( $node ){
+	public function visitObj( Less_Tree $node ) {
 
 		$funcName = 'visit'.$node->type;
 		if( isset($this->_visitFnCache[$funcName]) ){
@@ -34,7 +34,7 @@ class Less_VisitorReplacing extends Less_Visitor{
 		return $node;
 	}
 
-	public function visitArray( $nodes ){
+	public function visitArray( array $nodes ) : array {
 
 		$newNodes = array();
 		foreach($nodes as $node){
