@@ -69,31 +69,6 @@ class phpunit_FixturesTest extends phpunit_bootstrap{
 		$css = trim($css);
 		$this->assertEquals( $expected_css, $css );
 
-
-		// Check with cache
-		if( $this->cache_dir ){
-
-			$options = array('cache_dir'=>$this->cache_dir);
-			$files = array( $less_file => '' );
-
-			echo "\n    - Regenerating Cache";
-			$css_file_name = Less_Cache::Regen( $files, $options );
-			$css = file_get_contents($this->cache_dir.'/'.$css_file_name);
-			$css = trim($css);
-			$this->assertEquals( $expected_css, $css );
-
-
-
-			// Check using the cached data
-			echo "\n    - Using Cache";
-			$css_file_name = Less_Cache::Get( $files, $options );
-			$css = file_get_contents($this->cache_dir.'/'.$css_file_name);
-			$css = trim($css);
-			$this->assertEquals( $expected_css, $css );
-
-		}
-
-
 	}
 
 

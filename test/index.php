@@ -83,8 +83,6 @@ class ParserTest {
 		$dir = $fixtures_dir.'/'.$this->dir;
 
 		$this->lessJsProvider($dir);
-
-		Less_Cache::CleanCache();
 	}
 
 	public function WhichComparisons( $dir ) {
@@ -177,8 +175,6 @@ class ParserTest {
 		$options = array();
 		$options['compress'] 		= $this->compress;
 		//$options['relativeUrls']	= false;
-		//$options['cache_dir']		= $this->cache_dir;
-		//$options['cache_method']	= 'php';
 		//$options['urlArgs']	= '424242';
 
 
@@ -246,17 +242,6 @@ class ParserTest {
 
 		$compiled = '';
 		try{
-
-
-
-			/**
-			 * Less_Cache Testing
-			 * Less_Cache::SetCacheDir($this->cache_dir);
-			 * //$cached_css_file = Less_Cache::Regen( array($file_less=>'') );
-			 * //$options['output'] = md5($file_less).'.css';
-			 * $cached_css_file = Less_Cache::Get( array($file_less=>''), $options );
-			 * $compiled = file_get_contents( $this->cache_dir.'/'.$cached_css_file );
-			 */
 
 			$parser = new Less_Parser( $options );
 			$parser->parseFile( $file_less ); //$file_uri
@@ -689,7 +674,7 @@ function obj($mixed, $objects = array() ) {
 	$output = '';
 
 
-	$exclude_keys = array('originalRuleset','currentFileInfo','lookups','index','ruleset_id','type','_rulesets','_variables','allowImports','_css','cache_string','elements_len',
+	$exclude_keys = array('originalRuleset','currentFileInfo','lookups','index','ruleset_id','type','_rulesets','_variables','allowImports','_css','elements_len',
 					'_oelements','_oelements_assoc','first_oelements','_oelements_len','cacheable', ); //'variable','combinator'
 	//$exclude_keys = array();
 
