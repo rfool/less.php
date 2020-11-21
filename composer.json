@@ -1,5 +1,5 @@
 {
-	"name": "wikimedia/less.php",
+	"name": "rfool/less.php",
 	"description": "PHP port of the Javascript version of LESS http://lesscss.org (Originally maintained by Josh Schmidt)",
 	"keywords": [ "less", "css", "php", "stylesheet", "less.js", "lesscss" ],
 	"license": "Apache-2.0",
@@ -15,6 +15,10 @@
 		{
 			"name": "Martin Jantošovič",
 			"homepage": "https://github.com/Mordred"
+		},
+		{
+			"name": "Robert Frunzke",
+			"homepage": "https://github.com/rfool"
 		}
 	],
 	"require": {
