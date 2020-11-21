@@ -1,9 +1,9 @@
-[![Continuous Integration](https://github.com/wikimedia/less.php/workflows/PHP%20Test/badge.svg)](https://github.com/wikimedia/less.php/actions)
+[![Continuous Integration](https://github.com/rfool/less.php/workflows/PHP%20Test/badge.svg)](https://github.com/rfool/less.php/actions)
 
 [Less.php](http://lessphp.typesettercms.com)
 ========
 
-This is the Wikimedia fork of a PHP port of the official LESS processor <http://lesscss.org>.
+This is a fork of a PHP port of the official LESS processor <http://lesscss.org>.
 
 * [About](#about)
 * [Installation](#installation)
@@ -34,11 +34,11 @@ You can install the library with Composer or manually.
 #### Composer
 
 1. [Install Composer](https://getcomposer.org/download/)
-2. Run `composer require wikimedia/less.php`
+2. Run `composer require rfool/less.php`
 
 #### Manually From Release
 
-Step 1. [Download a release](https://github.com/wikimedia/less.php/releases) and upload the PHP files to your server.
+Step 1. [Download a release](https://github.com/rfool/less.php/releases) and upload the PHP files to your server.
 
 Step 2. Include the library:
 
@@ -212,7 +212,7 @@ This library can be used as drop-in replacement of lessphp to work with [Drupal 
 
 How to install:
 
-1. [Download the less.php source code](https://github.com/wikimedia/less.php/archive/master.zip) and unzip it so that 'lessc.inc.php' is located at 'sites/all/libraries/lessphp/lessc.inc.php'.
+1. [Download the less.php source code](https://github.com/rfool/less.php/archive/master.zip) and unzip it so that 'lessc.inc.php' is located at 'sites/all/libraries/lessphp/lessc.inc.php'.
 2. Download and install [Drupal 7 less module](https://drupal.org/project/less) as usual.
 3. That's it :)
 
@@ -249,11 +249,11 @@ How to install:
 
 Transitioning from Leafo/lessphp
 ---
-Projects looking for an easy transition from leafo/lessphp can use the lessc.inc.php adapter. To use, [Download the less.php source code](https://github.com/wikimedia/less.php/archive/master.zip) and unzip the files into your project so that the new 'lessc.inc.php' replaces the existing 'lessc.inc.php'.
+Projects looking for an easy transition from leafo/lessphp can use the lessc.inc.php adapter. To use, [Download the less.php source code](https://github.com/rfool/less.php/archive/master.zip) and unzip the files into your project so that the new 'lessc.inc.php' replaces the existing 'lessc.inc.php'.
 
 Note, the 'setPreserveComments' will no longer have any effect on the compiled LESS.
 
 Credits
 ---
-less.php was originally ported to PHP by [Matt Agar](https://github.com/agar) and then updated by [Martin Jantošovič](https://github.com/Mordred). This Wikimedia-maintained fork was split off from [Josh Schmidt's version](https://github.com/oyejorge/less.php).
+less.php was originally ported to PHP by [Matt Agar](https://github.com/agar) and then updated by [Martin Jantošovič](https://github.com/Mordred). This fork was split off from [Wikimedias's version](https://github.com/wikimedia/less.php).
 
