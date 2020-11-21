@@ -17,7 +17,7 @@ class Less_Visitor_toCSS extends Less_VisitorReplacing{
 	/**
 	 * @param Less_Tree_Ruleset $root
 	 */
-	public function run( $root ){
+	public function run( Less_Tree_Ruleset $root ) : Less_Tree_Ruleset {
 		return $this->visitObj($root);
 	}
 

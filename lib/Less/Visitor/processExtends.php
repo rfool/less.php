@@ -6,14 +6,14 @@
  * @package Less
  * @subpackage visitor
  */
-class Less_Visitor_processExtends extends Less_Visitor{
+class Less_Visitor_processExtends extends Less_Visitor {
 
 	public $allExtendsStack;
 
 	/**
 	 * @param Less_Tree_Ruleset $root
 	 */
-	public function run( $root ){
+	public function run( Less_Tree_Ruleset $root ) : Less_Tree_Ruleset {
 		$extendFinder = new Less_Visitor_extendFinder();
 		$extendFinder->run( $root );
 		if( !$extendFinder->foundExtends){
